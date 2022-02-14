@@ -5,7 +5,105 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
+    let addUserButton;
+    let getUserButton;
+    let urlSelect;
+    let responseSelect;
+    let nameInput;
+    let ageInput;
 
+    let contentHeader;
+    let content;
+
+    function parseResponse(response, isHEAD) {
+      let error = false;
+      switch(response.status) {
+        case 200:
+          contentHeader.innerHTML = `<b>Success</b>`;
+          break;
+        case 201:
+          contentHeader.innerHTML = '<b>Created</b>';
+          break;
+        case 204:
+          contentHeader.innerHTML = '<b>Updated</b>';
+          break;
+        case 400:
+          contentHeader.innerHTML = `<b>Bad Request</b>`;
+          error = true;
+          break;
+        case 404:
+          contentHeader.innerHTML = `<b>Not Found</b>`;
+          error = true;
+          break;
+        default:
+          contentHeader.innerHTML = `Status Code not Implemented!`;
+          break;
+      }
+
+      content.innerHTML = '';
+      
+                                  // 204 doesn't have a body to parse
+      if (!isHEAD && response.status !== 204)
+      {
+        // Callback function for changing promise into text
+        response.text().then((responseText) => {
+          if(responseText !== null) {
+            let parsedJSON = JSON.parse(responseText)
+            
+            if(error === false) {
+              parsedJSON = JSON.stringify(parsedJSON);
+              content.innerHTML = parsedJSON;
+            } else {
+              console.log(parsedJSON);
+              content.innerHTML = parsedJSON.message;
+            }   
+          }
+        });
+      }
+    }
+
+
+    async function sendFetchRequest(url,responseType) {
+      const options = {
+        method: responseType,
+        headers: {'Accept': 'application/json'},
+      }
+
+      if(responseType === 'POST') {
+        const formBody = `name=${nameInput.value}&age=${ageInput.value}`;
+        options.body = formBody;
+      }
+
+      let responsePromise = await fetch(url, options);
+      parseResponse(responsePromise, responseType === 'HEAD');
+    }
+    
+    const init = () => {
+      addUserButton = document.querySelector("#nameForm");
+      getUserButton = document.querySelector("#userForm");
+      urlSelect = document.querySelector("#urlField");
+      responseSelect = document.querySelector("#methodSelect");
+      nameInput = document.querySelector("#nameField");
+      ageInput = document.querySelector("#ageField");
+
+      contentHeader = document.querySelector("#contentHeader");
+      content = document.querySelector("#content");
+     
+      addUserButton.onsubmit = (e) => { 
+        e.preventDefault();
+        sendFetchRequest('/addUser','POST');
+        return false;
+      }
+
+      getUserButton.onsubmit = (e) => {
+        e.preventDefault();
+        // https://flexiple.com/javascript-capitalize-first-letter/#:~:text=To%20capitalize%20the%20first%20character,()%20function%20to%20capitalize%20it.
+        sendFetchRequest(urlSelect.value,responseSelect.value.toUpperCase());
+        return false;
+      }
+    }
+
+    window.onload = init;
   </script>
 </head>
 <body>
@@ -18,7 +116,7 @@
       <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
       <input type="submit" value="Add User" />
     </form>
-    <form id="userForm" action="/getUsers" method="get">
+    <form id="userForm" action="/notReal" method="get">
       <select id='urlField'>
         <option value='/getUsers'>/getUsers</option>
         <option value='/notReal'>/notReal</option>
@@ -30,6 +128,7 @@
       <input type="submit" value="Get User" />
     </form>
   </section>
+  <h3 id="contentHeader"></h3>
   <section id="content">
   </section>
 </body>

@@ -1,0 +1,26 @@
+{
+  "name": "http-api-assignment-ii-ewb",
+  "version": "1.0.0",
+  "description": "HW assignment for HTTP API #2",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EWBiv/http-api-assignment-ii.git"
+  },
+  "author": "Bud Boehringer",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/EWBiv/http-api-assignment/issues"
+  },
+  "homepage": "https://github.com/EWBiv/http-api-assignment-ii#readme",
+  "devDependencies": {
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.25.4"
+  }
+}
